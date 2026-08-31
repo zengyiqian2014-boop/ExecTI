@@ -5,7 +5,13 @@ utility. It launches any program with **TrustedInstaller** privileges — the se
 context that owns Windows' OS-protected files and registry keys (TrustedInstaller
 outranks *Administrator* and even *SYSTEM* on those objects).
 
-Cross-compiled with **MinGW** for both **x86_64** and **ARM64** Windows.
+Two front ends, cross-compiled with **MinGW** for both **x86_64** and **ARM64** Windows:
+
+- **`execti-gui.exe`** — a **Run-style dialog** (like Win+R) but launching as
+  TrustedInstaller. Editable combo box with a **dropdown arrow that shows your
+  recently-used entries** (history persisted in the registry), a **Browse...**
+  button to pick a program, and a **Folder...** button to pick a folder.
+- **`execti.exe`** — a console tool for scripting: `execti.exe [program] [args...]`.
 
 > ⚠️ **Use responsibly.** This is a system-administration / security-research tool.
 > Running as TrustedInstaller lets you overwrite protected OS files and registry
@@ -16,11 +22,31 @@ Cross-compiled with **MinGW** for both **x86_64** and **ARM64** Windows.
 
 ## What it does
 
-`execti.exe [program] [args...]`
+### GUI — `execti-gui.exe`
 
-With no arguments it opens an elevated `cmd.exe` running as
-`NT SERVICE\TrustedInstaller`. Verify inside that shell with `whoami /groups` — you'll
-see the `S-1-5-80-956008885-...` TrustedInstaller SID with *Owner* / *Enabled* flags.
+Double-click it (accept the UAC prompt) and you get a small Run-style window:
+
+```
+ 🛡  Type a program, folder, or file name, and ExecTI will
+     run it with TrustedInstaller privileges.
+
+ Open: [ regedit                              ▼ ]   <- dropdown = history
+        [ 运行 ]  [ 取消 ]  [ 浏览... ]  [ 文件夹... ]
+```
+
+- Type a command (`regedit`, `cmd`, `notepad C:\Windows\System32\drivers\etc\hosts`),
+  or a full path, or `%windir%`-style variables — then press **运行 (Run)** / Enter.
+- Click the **▼ arrow** on the right of the box to drop down the list of things you
+  ran before (kept in `HKCU\Software\ExecTI`, most-recent first, up to 20 entries).
+- **浏览... (Browse)** opens a file picker; **文件夹... (Folder)** opens a folder
+  picker (a folder is opened in Explorer as TrustedInstaller).
+
+### Console — `execti.exe`
+
+`execti.exe [program] [args...]` — with no arguments it opens an elevated `cmd.exe`
+running as `NT SERVICE\TrustedInstaller`. Verify inside that shell with
+`whoami /groups` — you'll see the `S-1-5-80-956008885-...` TrustedInstaller SID with
+*Owner* / *Enabled* flags.
 
 ```
 execti.exe                          # TrustedInstaller command prompt
@@ -88,8 +114,10 @@ make arm64      # -> build/arm64/execti.exe
 Output:
 
 ```
-build/x86_64/execti.exe   PE32+ executable, x86-64
-build/arm64/execti.exe    PE32+ executable, Aarch64
+build/x86_64/execti.exe       console, x86-64
+build/x86_64/execti-gui.exe   GUI,     x86-64
+build/arm64/execti.exe        console, Aarch64
+build/arm64/execti-gui.exe    GUI,     Aarch64
 ```
 
 Both are statically linked (`-static-libgcc -static-libstdc++`) so they depend only
@@ -114,12 +142,15 @@ You can also trigger it manually from the **Actions → release** tab
 ## Project layout
 
 ```
-src/execti.cpp        core implementation (Win32 token manipulation)
-src/execti.rc         version info + manifest resource
-src/execti.manifest   requireAdministrator (UAC) manifest
-Makefile              cross-compile rules for x64 + arm64
-build.sh              convenience wrapper
-.github/workflows/    CI that builds both architectures
+src/trustedinstaller.h  shared TrustedInstaller launch logic (header-only)
+src/execti.cpp          console front end
+src/execti_gui.cpp      GUI front end (Run dialog + history + browse)
+src/execti.rc           console version info + manifest resource
+src/execti_gui.rc       GUI version info + manifest resource
+src/execti.manifest     requireAdministrator (UAC) + themed controls + dpiAware
+Makefile                cross-compile rules: 2 front ends x (x64 + arm64)
+build.sh                convenience wrapper
+.github/workflows/      CI + release automation
 ```
 
 ## References / further reading

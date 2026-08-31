@@ -41,11 +41,13 @@ jobs:
       - name: Stage release assets
         run: |
           mkdir -p dist
-          cp build/x86_64/execti.exe dist/execti-x86_64.exe
-          cp build/arm64/execti.exe  dist/execti-arm64.exe
+          cp build/x86_64/execti.exe     dist/execti-x86_64.exe
+          cp build/x86_64/execti-gui.exe dist/execti-gui-x86_64.exe
+          cp build/arm64/execti.exe      dist/execti-arm64.exe
+          cp build/arm64/execti-gui.exe  dist/execti-gui-arm64.exe
           cd dist
-          sha256sum execti-x86_64.exe execti-arm64.exe > SHA256SUMS.txt
-          zip execti-windows-x64-arm64.zip execti-x86_64.exe execti-arm64.exe SHA256SUMS.txt
+          sha256sum *.exe > SHA256SUMS.txt
+          zip execti-windows-x64-arm64.zip *.exe SHA256SUMS.txt
           ls -lh
 
       - name: Resolve tag name
@@ -65,6 +67,8 @@ jobs:
           generate_release_notes: true
           files: |
             dist/execti-x86_64.exe
+            dist/execti-gui-x86_64.exe
             dist/execti-arm64.exe
+            dist/execti-gui-arm64.exe
             dist/execti-windows-x64-arm64.zip
             dist/SHA256SUMS.txt

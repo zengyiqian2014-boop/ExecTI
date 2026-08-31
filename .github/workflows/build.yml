@@ -1,0 +1,45 @@
+name: build
+
+# Cross-compile ExecTI for Windows x86_64 and ARM64 using MinGW on a Linux runner.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cross-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mingw-w64 (x86_64 toolchain)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64
+
+      - name: Install llvm-mingw (ARM64 toolchain)
+        run: |
+          curl -fsSL -o /tmp/llvm-mingw.tar.xz \
+            https://github.com/mstorsjo/llvm-mingw/releases/download/20250528/llvm-mingw-20250528-ucrt-ubuntu-22.04-x86_64.tar.xz
+          sudo tar -C /opt -xf /tmp/llvm-mingw.tar.xz
+          sudo mv /opt/llvm-mingw-* /opt/llvm-mingw
+          echo "/opt/llvm-mingw/bin" >> "$GITHUB_PATH"
+
+      - name: Build both architectures
+        run: make all
+
+      - name: Show artifacts
+        run: |
+          file build/x86_64/execti.exe
+          file build/arm64/execti.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: execti-x86_64
+          path: build/x86_64/execti.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: execti-arm64
+          path: build/arm64/execti.exe

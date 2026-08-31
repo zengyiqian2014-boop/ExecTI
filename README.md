@@ -13,6 +13,9 @@ Two front ends, cross-compiled with **MinGW** for both **x86_64** and **ARM64** 
   button to pick a program, and a **Folder...** button to pick a folder.
 - **`execti.exe`** — a console tool for scripting: `execti.exe [program] [args...]`.
 
+**⬇ Just want the program?** Prebuilt `.exe` files are in [`bin/`](bin/) (and on the
+GitHub **Releases** page). Most PCs → `bin/execti-gui-x86_64.exe`.
+
 > ⚠️ **Use responsibly.** This is a system-administration / security-research tool.
 > Running as TrustedInstaller lets you overwrite protected OS files and registry
 > keys — a mistake can render Windows unbootable. Only run it on systems you own

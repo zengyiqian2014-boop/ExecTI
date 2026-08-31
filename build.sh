@@ -31,7 +31,8 @@ echo "==> Building both architectures"
 make all
 
 echo "==> Artifacts"
-for f in build/x86_64/execti.exe build/arm64/execti.exe; do
+for f in build/x86_64/execti.exe build/x86_64/execti-gui.exe \
+         build/arm64/execti.exe  build/arm64/execti-gui.exe; do
     [ -f "$f" ] && echo "  $f  ($(du -h "$f" | cut -f1))"
 done
 echo "Done."

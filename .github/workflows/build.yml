@@ -31,15 +31,15 @@ jobs:
 
       - name: Show artifacts
         run: |
-          file build/x86_64/execti.exe
-          file build/arm64/execti.exe
+          file build/x86_64/execti.exe build/x86_64/execti-gui.exe
+          file build/arm64/execti.exe  build/arm64/execti-gui.exe
 
       - uses: actions/upload-artifact@v4
         with:
           name: execti-x86_64
-          path: build/x86_64/execti.exe
+          path: build/x86_64/*.exe
 
       - uses: actions/upload-artifact@v4
         with:
           name: execti-arm64
-          path: build/arm64/execti.exe
+          path: build/arm64/*.exe

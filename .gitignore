@@ -1,5 +1,7 @@
 build/
-*.o
-*.exe
-*.obj
 dist/
+*.o
+*.obj
+*.exe
+# ...but the committed prebuilt binaries live in bin/ and are kept.
+!bin/*.exe

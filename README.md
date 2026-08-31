@@ -96,6 +96,21 @@ Both are statically linked (`-static-libgcc -static-libstdc++`) so they depend o
 on system DLLs (`kernel32`, `advapi32`) plus the Universal CRT that ships with
 Windows 10/11. The embedded manifest triggers the UAC elevation prompt.
 
+## Releases
+
+Prebuilt binaries are published automatically. Push a version tag and CI builds
+both architectures and attaches them (plus a combined zip and `SHA256SUMS.txt`) to
+a GitHub Release:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+You can also trigger it manually from the **Actions → release** tab
+(`workflow_dispatch`) with a tag name. See
+[`.github/workflows/release.yml`](.github/workflows/release.yml).
+
 ## Project layout
 
 ```

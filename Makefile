@@ -3,7 +3,7 @@
 # ============================================================================
 #
 #  Builds two front ends, for two architectures (4 binaries total):
-#    execti.exe      - console tool:  execti.exe [program] [args...]
+#    execti-cli.exe  - console tool:  execti-cli.exe [program] [args...]
 #    execti-gui.exe  - Run-style GUI with history dropdown + Browse / Folder
 #
 #  Toolchains
@@ -38,6 +38,7 @@ LIBS_CON   := -ladvapi32 -lkernel32
 # GUI also needs the common/comdlg/shell libraries.
 LIBS_GUI   := -ladvapi32 -lkernel32 -lcomctl32 -lcomdlg32 -lshell32 -lole32 -luuid
 
+ICON       := src/execti.ico
 BUILD      := build
 X64_DIR    := $(BUILD)/x86_64
 ARM64_DIR  := $(BUILD)/arm64
@@ -45,17 +46,17 @@ ARM64_DIR  := $(BUILD)/arm64
 .PHONY: all x64 arm64 clean
 all: x64 arm64
 
-x64:   $(X64_DIR)/execti.exe   $(X64_DIR)/execti-gui.exe
-arm64: $(ARM64_DIR)/execti.exe $(ARM64_DIR)/execti-gui.exe
+x64:   $(X64_DIR)/execti-cli.exe   $(X64_DIR)/execti-gui.exe
+arm64: $(ARM64_DIR)/execti-cli.exe $(ARM64_DIR)/execti-gui.exe
 
 # ------------------------------- x86_64 -------------------------------------
-$(X64_DIR)/execti-res.o: src/execti.rc src/execti.manifest | $(X64_DIR)
+$(X64_DIR)/cli-res.o: src/execti.rc src/execti.manifest $(ICON) | $(X64_DIR)
 	$(WINDRES_X64) -I src -O coff src/execti.rc $@
-$(X64_DIR)/gui-res.o: src/execti_gui.rc src/execti.manifest | $(X64_DIR)
+$(X64_DIR)/gui-res.o: src/execti_gui.rc src/execti.manifest $(ICON) | $(X64_DIR)
 	$(WINDRES_X64) -I src -O coff src/execti_gui.rc $@
 
-$(X64_DIR)/execti.exe: src/execti.cpp src/trustedinstaller.h $(X64_DIR)/execti-res.o | $(X64_DIR)
-	$(CXX_X64) $(CXXFLAGS) src/execti.cpp $(X64_DIR)/execti-res.o \
+$(X64_DIR)/execti-cli.exe: src/execti.cpp src/trustedinstaller.h $(X64_DIR)/cli-res.o | $(X64_DIR)
+	$(CXX_X64) $(CXXFLAGS) src/execti.cpp $(X64_DIR)/cli-res.o \
 		$(LDBASE) -Wl,--subsystem,console $(LIBS_CON) -o $@
 	@echo "[x86_64] -> $@"
 
@@ -65,13 +66,13 @@ $(X64_DIR)/execti-gui.exe: src/execti_gui.cpp src/trustedinstaller.h $(X64_DIR)/
 	@echo "[x86_64] -> $@"
 
 # ------------------------------- ARM64 --------------------------------------
-$(ARM64_DIR)/execti-res.o: src/execti.rc src/execti.manifest | $(ARM64_DIR)
+$(ARM64_DIR)/cli-res.o: src/execti.rc src/execti.manifest $(ICON) | $(ARM64_DIR)
 	$(WINDRES_ARM64) -I src -O coff src/execti.rc $@
-$(ARM64_DIR)/gui-res.o: src/execti_gui.rc src/execti.manifest | $(ARM64_DIR)
+$(ARM64_DIR)/gui-res.o: src/execti_gui.rc src/execti.manifest $(ICON) | $(ARM64_DIR)
 	$(WINDRES_ARM64) -I src -O coff src/execti_gui.rc $@
 
-$(ARM64_DIR)/execti.exe: src/execti.cpp src/trustedinstaller.h $(ARM64_DIR)/execti-res.o | $(ARM64_DIR)
-	$(CXX_ARM64) $(CXXFLAGS) src/execti.cpp $(ARM64_DIR)/execti-res.o \
+$(ARM64_DIR)/execti-cli.exe: src/execti.cpp src/trustedinstaller.h $(ARM64_DIR)/cli-res.o | $(ARM64_DIR)
+	$(CXX_ARM64) $(CXXFLAGS) src/execti.cpp $(ARM64_DIR)/cli-res.o \
 		$(LDBASE) -Wl,--subsystem,console $(LIBS_CON) -o $@
 	@echo "[arm64]  -> $@"
 

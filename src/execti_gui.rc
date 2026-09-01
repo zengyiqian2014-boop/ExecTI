@@ -3,6 +3,9 @@
 // Embed the shared application manifest (UAC elevation + themed controls).
 1 24 "execti.manifest"
 
+// Application icon (lowest id -> what Explorer / taskbar / title bar show).
+1 ICON "execti.ico"
+
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 1,0,0,0
  PRODUCTVERSION 1,0,0,0

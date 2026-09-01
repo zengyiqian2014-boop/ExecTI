@@ -163,8 +163,8 @@ static void BrowseFile(HWND hwnd) {
     OPENFILENAMEW ofn{};
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner   = hwnd;
-    ofn.lpstrFilter = L"程序 (*.exe;*.bat;*.cmd;*.msc)\0*.exe;*.bat;*.cmd;*.msc\0"
-                      L"所有文件 (*.*)\0*.*\0";
+    ofn.lpstrFilter = L"Programs (*.exe;*.bat;*.cmd;*.msc)\0*.exe;*.bat;*.cmd;*.msc\0"
+                      L"All files (*.*)\0*.*\0";
     ofn.lpstrFile   = file;
     ofn.nMaxFile    = 1024;
     ofn.Flags       = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER;
@@ -175,7 +175,7 @@ static void BrowseFile(HWND hwnd) {
 static void BrowseFolder(HWND hwnd) {
     BROWSEINFOW bi{};
     bi.hwndOwner = hwnd;
-    bi.lpszTitle = L"选择一个文件夹";  // "Select a folder"
+    bi.lpszTitle = L"Select a folder";
     bi.ulFlags   = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
     LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
     if (pidl) {
@@ -190,8 +190,7 @@ static void BrowseFolder(HWND hwnd) {
 static void DoRun(HWND hwnd) {
     std::wstring raw = ComboText();
     if (raw.empty()) {
-        MessageBoxW(hwnd, L"请输入要运行的程序、"
-                          L"文件或文件夹。",  // please enter...
+        MessageBoxW(hwnd, L"Please enter a program, file, or folder to run.",
                     L"ExecTI", MB_ICONINFORMATION);
         return;
     }
@@ -205,7 +204,7 @@ static void DoRun(HWND hwnd) {
         DestroyWindow(hwnd);  // close on success, like the Run dialog
     } else {
         MessageBoxW(hwnd, err.c_str(),
-                    L"ExecTI - 启动失败",  // "launch failed"
+                    L"ExecTI - Launch failed",
                     MB_ICONERROR);
     }
 }
@@ -231,12 +230,11 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         if (hIcon) SendMessageW(ico, STM_SETICON, reinterpret_cast<WPARAM>(hIcon), 0);
 
         MakeControl(hwnd, L"STATIC",
-                    L"输入程序、文件夹或文件"
-                    L"名，ExecTI 将以 TrustedInstaller "
-                    L"权限运行它。",  // "Type a program/folder/file; ExecTI will run it as TrustedInstaller."
+                    L"Type the name of a program, folder, or file, and "
+                    L"ExecTI will run it with TrustedInstaller privileges.",
                     0, 56, 14, 392, 44, ID_PROMPT);
 
-        MakeControl(hwnd, L"STATIC", L"打开(&O):",  // "Open:"
+        MakeControl(hwnd, L"STATIC", L"&Open:",
                     0, 62, 12, 44, 20, ID_LABEL);
 
         // editable combo box with dropdown history (the "little arrow")
@@ -246,13 +244,13 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                               56, 58, 392, 220, ID_COMBO);
 
         // buttons row
-        MakeControl(hwnd, L"BUTTON", L"运行(&R)",  // "Run"
+        MakeControl(hwnd, L"BUTTON", L"&Run",
                     BS_DEFPUSHBUTTON | WS_TABSTOP, 64, 100, 90, 28, ID_RUN);
-        MakeControl(hwnd, L"BUTTON", L"取消",  // "Cancel"
+        MakeControl(hwnd, L"BUTTON", L"Cancel",
                     WS_TABSTOP, 162, 100, 90, 28, ID_CANCEL);
-        MakeControl(hwnd, L"BUTTON", L"浏览(&B)...",  // "Browse..."
+        MakeControl(hwnd, L"BUTTON", L"&Browse...",
                     WS_TABSTOP, 260, 100, 90, 28, ID_BROWSE);
-        MakeControl(hwnd, L"BUTTON", L"文件夹(&F)...",  // "Folder..."
+        MakeControl(hwnd, L"BUTTON", L"&Folder...",
                     WS_TABSTOP, 358, 100, 90, 28, ID_FOLDER);
 
         // fill history + focus the combo edit
@@ -314,7 +312,7 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, PWSTR, int nCmdShow) {
 
     HWND hwnd = CreateWindowExW(
         0, wc.lpszClassName,
-        L"ExecTI - 以 TrustedInstaller 运行",  // "Run as TrustedInstaller"
+        L"ExecTI - Run as TrustedInstaller",
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
         sx, sy, ww, wh, nullptr, nullptr, hInst, nullptr);
     if (!hwnd) return 1;

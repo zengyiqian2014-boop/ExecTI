@@ -44,15 +44,15 @@ Double-click it (accept the UAC prompt) and you get a small Run-style window:
      run it with TrustedInstaller privileges.
 
  Open: [ regedit                              ▼ ]   <- dropdown = history
-        [ 运行 ]  [ 取消 ]  [ 浏览... ]  [ 文件夹... ]
+        [ Run ]  [ Cancel ]  [ Browse... ]  [ Folder... ]
 ```
 
 - Type a command (`regedit`, `cmd`, `notepad C:\Windows\System32\drivers\etc\hosts`),
-  or a full path, or `%windir%`-style variables — then press **运行 (Run)** / Enter.
+  or a full path, or `%windir%`-style variables — then press **Run** / Enter.
 - Click the **▼ arrow** on the right of the box to drop down the list of things you
   ran before (kept in `HKCU\Software\ExecTI`, most-recent first, up to 20 entries).
-- **浏览... (Browse)** opens a file picker; **文件夹... (Folder)** opens a folder
-  picker (a folder is opened in Explorer as TrustedInstaller).
+- **Browse** opens a file picker; **Folder** opens a folder picker (a folder is
+  opened in Explorer as TrustedInstaller).
 
 ### CLI — `execti-cli.exe`
 

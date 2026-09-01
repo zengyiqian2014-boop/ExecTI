@@ -297,7 +297,11 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, PWSTR, int nCmdShow) {
     wc.hCursor       = LoadCursorW(nullptr, IDC_ARROW);
     wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1);
     wc.lpszClassName = L"ExecTIWindow";
-    wc.hIcon         = LoadIconW(nullptr, IDI_SHIELD);
+    // Use the embedded app icon (resource id 1) for title bar + taskbar;
+    // fall back to the system shield if it can't be loaded.
+    wc.hIcon         = LoadIconW(hInst, MAKEINTRESOURCEW(1));
+    if (!wc.hIcon) wc.hIcon = LoadIconW(nullptr, IDI_SHIELD);
+    wc.hIconSm       = wc.hIcon;
     RegisterClassExW(&wc);
 
     // Fixed-size dialog-like window, centered.

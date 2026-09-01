@@ -5,13 +5,23 @@ utility. It launches any program with **TrustedInstaller** privileges — the se
 context that owns Windows' OS-protected files and registry keys (TrustedInstaller
 outranks *Administrator* and even *SYSTEM* on those objects).
 
-Two front ends, cross-compiled with **MinGW** for both **x86_64** and **ARM64** Windows:
+Two front ends, cross-compiled with **MinGW** for both **x86_64** and **ARM64** Windows.
 
-- **`execti-gui.exe`** — a **Run-style dialog** (like Win+R) but launching as
-  TrustedInstaller. Editable combo box with a **dropdown arrow that shows your
-  recently-used entries** (history persisted in the registry), a **Browse...**
-  button to pick a program, and a **Folder...** button to pick a folder.
-- **`execti.exe`** — a console tool for scripting: `execti.exe [program] [args...]`.
+### GUI vs CLI — which one?
+
+Both do the exact same thing (run a program as TrustedInstaller); they differ only
+in how you drive them:
+
+| | **GUI** — `execti-gui-*.exe` | **CLI** — `execti-cli-*.exe` |
+| --- | --- | --- |
+| Interface | A graphical **"Run" dialog** (like Win+R) | A **console** command |
+| How you use it | **Double-click**, type or browse, click Run | Type `execti-cli <program>` in a terminal / script |
+| Picking the target | Editable box + **Browse** (file) + **Folder** buttons | Pass it as an argument |
+| History | **Dropdown ▼** remembers recent entries (saved in registry) | — (use your shell history) |
+| Best for | Everyday interactive use | Automation, scripts, `.bat` files, remote shells |
+| Window | Yes | No (runs and exits) |
+
+If you're not sure, use the **GUI**.
 
 **⬇ Just want the program?** Prebuilt `.exe` files are in [`bin/`](bin/) (and on the
 GitHub **Releases** page). Most PCs → `bin/execti-gui-x86_64.exe`.
@@ -44,17 +54,17 @@ Double-click it (accept the UAC prompt) and you get a small Run-style window:
 - **浏览... (Browse)** opens a file picker; **文件夹... (Folder)** opens a folder
   picker (a folder is opened in Explorer as TrustedInstaller).
 
-### Console — `execti.exe`
+### CLI — `execti-cli.exe`
 
-`execti.exe [program] [args...]` — with no arguments it opens an elevated `cmd.exe`
-running as `NT SERVICE\TrustedInstaller`. Verify inside that shell with
+`execti-cli.exe [program] [args...]` — with no arguments it opens an elevated
+`cmd.exe` running as `NT SERVICE\TrustedInstaller`. Verify inside that shell with
 `whoami /groups` — you'll see the `S-1-5-80-956008885-...` TrustedInstaller SID with
 *Owner* / *Enabled* flags.
 
 ```
-execti.exe                          # TrustedInstaller command prompt
-execti.exe regedit.exe              # registry editor as TrustedInstaller
-execti.exe cmd.exe /c "del C:\Windows\System32\some_protected_file"
+execti-cli.exe                          # TrustedInstaller command prompt
+execti-cli.exe regedit.exe              # registry editor as TrustedInstaller
+execti-cli.exe cmd.exe /c "del C:\Windows\System32\some_protected_file"
 ```
 
 ## How it works
@@ -107,8 +117,8 @@ export PATH="/opt/llvm-mingw/bin:$PATH"
 
 ```bash
 make            # both architectures
-make x64        # -> build/x86_64/execti.exe
-make arm64      # -> build/arm64/execti.exe
+make x64        # -> build/x86_64/execti-cli.exe + execti-gui.exe
+make arm64      # -> build/arm64/execti-cli.exe + execti-gui.exe
 
 # or the convenience script (auto-detects /opt/llvm-mingw):
 ./build.sh
@@ -117,10 +127,10 @@ make arm64      # -> build/arm64/execti.exe
 Output:
 
 ```
-build/x86_64/execti.exe       console, x86-64
-build/x86_64/execti-gui.exe   GUI,     x86-64
-build/arm64/execti.exe        console, Aarch64
-build/arm64/execti-gui.exe    GUI,     Aarch64
+build/x86_64/execti-cli.exe   CLI (console), x86-64
+build/x86_64/execti-gui.exe   GUI,           x86-64
+build/arm64/execti-cli.exe    CLI (console), Aarch64
+build/arm64/execti-gui.exe    GUI,           Aarch64
 ```
 
 Both are statically linked (`-static-libgcc -static-libstdc++`) so they depend only
@@ -146,13 +156,15 @@ You can also trigger it manually from the **Actions → release** tab
 
 ```
 src/trustedinstaller.h  shared TrustedInstaller launch logic (header-only)
-src/execti.cpp          console front end
+src/execti.cpp          CLI (console) front end
 src/execti_gui.cpp      GUI front end (Run dialog + history + browse)
-src/execti.rc           console version info + manifest resource
+src/execti.rc           CLI version info + manifest resource
 src/execti_gui.rc       GUI version info + manifest resource
 src/execti.manifest     requireAdministrator (UAC) + themed controls + dpiAware
+src/execti.ico          application icon (embedded in both .exe files)
 Makefile                cross-compile rules: 2 front ends x (x64 + arm64)
 build.sh                convenience wrapper
+bin/                    prebuilt binaries (execti-cli-* / execti-gui-*)
 .github/workflows/      CI + release automation
 ```
 

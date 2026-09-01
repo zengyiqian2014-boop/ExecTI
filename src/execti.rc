@@ -4,6 +4,9 @@
 // RT_MANIFEST = 24, CREATEPROCESS_MANIFEST_RESOURCE_ID = 1
 1 24 "execti.manifest"
 
+// Application icon (lowest id -> what Explorer / taskbar show).
+1 ICON "execti.ico"
+
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 1,0,0,0
  PRODUCTVERSION 1,0,0,0
@@ -15,10 +18,10 @@ BEGIN
     BLOCK "040904b0"
     BEGIN
       VALUE "CompanyName",      "Open Source"
-      VALUE "FileDescription",  "ExecTI - run a program as TrustedInstaller"
+      VALUE "FileDescription",  "ExecTI CLI - run a program as TrustedInstaller"
       VALUE "FileVersion",      "1.0.0.0"
-      VALUE "InternalName",     "execti"
-      VALUE "OriginalFilename", "execti.exe"
+      VALUE "InternalName",     "execti-cli"
+      VALUE "OriginalFilename", "execti-cli.exe"
       VALUE "ProductName",      "ExecTI"
       VALUE "ProductVersion",   "1.0.0.0"
     END

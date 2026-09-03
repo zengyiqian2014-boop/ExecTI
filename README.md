@@ -64,8 +64,39 @@ Double-click it (accept the UAC prompt) and you get a small Run-style window:
 ```
 execti-cli.exe                          # TrustedInstaller command prompt
 execti-cli.exe regedit.exe              # registry editor as TrustedInstaller
-execti-cli.exe cmd.exe /c "del C:\Windows\System32\some_protected_file"
+execti-cli.exe -u system cmd.exe        # run as SYSTEM instead
+execti-cli.exe -i medium -u admin cmd   # current user, Medium integrity
+execti-cli.exe -w -- setup.exe /quiet   # run as TI and wait for it to finish
 ```
+
+Full flag set:
+
+```
+-u, --user <ti|system|admin>              token source              (default: ti)
+-i, --integrity <system|high|medium|low>  integrity level           (default: system)
+-p, --no-priv                             do NOT enable all privileges
+-d, --cwd <dir>                           working directory
+-w, --wait                                wait for the process to exit
+    --no-console                          reuse this console (no new window)
+-h, --help                                show help
+```
+
+## Options (v2.0.0 — full edition)
+
+Both front ends expose the same launch engine (`src/trustedinstaller.h`). The GUI
+shows these as a **Run as** dropdown, an **Integrity** dropdown, and checkboxes:
+
+| Option | Choices | Notes |
+| --- | --- | --- |
+| **Token source** | TrustedInstaller · SYSTEM · Current user (elevated) | who the process runs as |
+| **Integrity level** | System · High · Medium · Low | mandatory label on the new token |
+| **Enable all privileges** | on / off | flip every privilege the token holds to *enabled* |
+| **New console** | on / off | give the child its own console window |
+| **Working directory** | path | CLI `--cwd`; GUI derives it from a browsed file/folder |
+| **Wait** | on / off | CLI `--wait`; block until the child exits |
+
+This is a superset of the classic ExecTI, in the spirit of **NSudo** — same
+documented token manipulation, plus native **ARM64** builds and a history dropdown.
 
 ## How it works
 

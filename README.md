@@ -88,6 +88,14 @@ public Win32 APIs, and it requires you to already be an Administrator:
 
 See [`src/execti.cpp`](src/execti.cpp) — every step is commented.
 
+**Maximum privilege (v1.2.0+):** before launching, ExecTI enables *every* privilege
+present on the TrustedInstaller token (`SeDebugPrivilege`, `SeTcbPrivilege`,
+`SeLoadDriverPrivilege`, `SeTakeOwnershipPrivilege`, …). So the target runs with the
+**TrustedInstaller identity *and* the full SYSTEM-grade privilege set active** — the
+highest authority a normal user-mode program can hold. (This is still ordinary,
+documented token manipulation — it does not touch the kernel or bypass any security
+control; verify inside the spawned shell with `whoami /priv`.)
+
 ## Building
 
 ### Toolchains

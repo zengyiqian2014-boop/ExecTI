@@ -7,8 +7,8 @@
 1 ICON "execti.ico"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,2,0,0
+ PRODUCTVERSION 1,2,0,0
  FILEOS VOS__WINDOWS32
  FILETYPE VFT_APP
 BEGIN
@@ -17,12 +17,12 @@ BEGIN
     BLOCK "040904b0"
     BEGIN
       VALUE "CompanyName",      "Open Source"
-      VALUE "FileDescription",  "ExecTI GUI - run a program as TrustedInstaller"
-      VALUE "FileVersion",      "1.0.0.0"
+      VALUE "FileDescription",  "ExecTI GUI - run a program as TrustedInstaller (all privileges)"
+      VALUE "FileVersion",      "1.2.0.0"
       VALUE "InternalName",     "execti-gui"
       VALUE "OriginalFilename", "execti-gui.exe"
       VALUE "ProductName",      "ExecTI"
-      VALUE "ProductVersion",   "1.0.0.0"
+      VALUE "ProductVersion",   "1.2.0.0"
     END
   END
   BLOCK "VarFileInfo"

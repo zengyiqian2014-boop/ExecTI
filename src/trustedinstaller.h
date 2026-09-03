@@ -26,6 +26,7 @@
 #include <tlhelp32.h>
 #include <winsvc.h>
 #include <string>
+#include <vector>
 
 #ifndef PROCESS_QUERY_LIMITED_INFORMATION
 #define PROCESS_QUERY_LIMITED_INFORMATION 0x1000
@@ -50,6 +51,23 @@ inline bool EnablePrivilege(HANDLE hToken, const wchar_t* name) {
     if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), nullptr, nullptr))
         return false;
     return GetLastError() != ERROR_NOT_ALL_ASSIGNED;
+}
+
+// Enable *every* privilege the token holds (SeDebug, SeTcb, SeLoadDriver, ...).
+// The TrustedInstaller token already carries the full high-privilege set; this
+// just flips them all to ENABLED so the launched process starts with maximum
+// authority ("TrustedInstaller identity + all SYSTEM-grade privileges active").
+inline void EnableAllPrivileges(HANDLE hToken) {
+    DWORD len = 0;
+    GetTokenInformation(hToken, TokenPrivileges, nullptr, 0, &len);
+    if (!len) return;
+    std::vector<BYTE> buf(len);
+    if (!GetTokenInformation(hToken, TokenPrivileges, buf.data(), len, &len))
+        return;
+    auto* tp = reinterpret_cast<TOKEN_PRIVILEGES*>(buf.data());
+    for (DWORD i = 0; i < tp->PrivilegeCount; ++i)
+        tp->Privileges[i].Attributes = SE_PRIVILEGE_ENABLED;
+    AdjustTokenPrivileges(hToken, FALSE, tp, len, nullptr, nullptr);
 }
 
 inline bool EnableDebugPrivilege(std::wstring& err) {
@@ -160,6 +178,9 @@ inline bool LaunchWithToken(DWORD tiPid, const std::wstring& cmdline,
     if (OpenProcessToken(hProc, TOKEN_DUPLICATE | TOKEN_QUERY, &hTok)) {
         if (DuplicateTokenEx(hTok, TOKEN_ALL_ACCESS, nullptr,
                              SecurityImpersonation, TokenPrimary, &hDup)) {
+            // Enhanced: run with the full privilege set enabled, not just the
+            // default TrustedInstaller identity.
+            EnableAllPrivileges(hDup);
             STARTUPINFOW si{};
             si.cb = sizeof(si);
             si.lpDesktop = const_cast<wchar_t*>(L"Winsta0\\Default");

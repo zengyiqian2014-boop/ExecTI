@@ -213,7 +213,10 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
     case WM_CREATE: {
         HWND ico = MakeControl(hwnd, L"STATIC", L"", SS_ICON, 14, 16, 32, 32, ID_ICON);
-        HICON hIcon = LoadIconW(nullptr, IDI_SHIELD);
+        // Use the app's own gold-shield icon (resource id 1), matching the .ico /
+        // taskbar icon; fall back to the system UAC shield only if it can't load.
+        HICON hIcon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(1));
+        if (!hIcon) hIcon = LoadIconW(nullptr, IDI_SHIELD);
         if (hIcon) SendMessageW(ico, STM_SETICON, reinterpret_cast<WPARAM>(hIcon), 0);
 
         MakeControl(hwnd, L"STATIC",

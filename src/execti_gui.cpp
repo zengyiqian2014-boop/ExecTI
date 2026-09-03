@@ -209,6 +209,36 @@ static void AddItem(HWND combo, const wchar_t* s) {
     SendMessageW(combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(s));
 }
 
+static void MoveCtl(HWND parent, int id, int x, int y, int w, int h) {
+    MoveWindow(GetDlgItem(parent, id), x, y, w, h, TRUE);
+}
+
+// Reflow the controls for the current client size: the prompt and command box
+// stretch with the width; the four buttons stay pinned to the bottom-right.
+static void LayoutControls(HWND hwnd) {
+    RECT rc; GetClientRect(hwnd, &rc);
+    int cw = rc.right, ch = rc.bottom;
+    const int R = 16;
+
+    MoveCtl(hwnd, ID_ICON,     14, 16, 32, 32);
+    MoveCtl(hwnd, ID_PROMPT,   56, 12, cw - 56 - R, 40);
+    MoveCtl(hwnd, ID_LABEL,    14, 66, 44, 20);
+    MoveCtl(hwnd, ID_COMBO,    58, 62, cw - 58 - R, 220);
+    MoveCtl(hwnd, ID_SRCLBL,   14, 104, 46, 18);
+    MoveCtl(hwnd, ID_SRC,      64, 100, 168, 200);
+    MoveCtl(hwnd, ID_INTEGLBL, 248, 104, 56, 18);
+    MoveCtl(hwnd, ID_INTEG,    308, 100, 158, 200);
+    MoveCtl(hwnd, ID_ALLPRIV,  64, 134, 190, 22);
+    MoveCtl(hwnd, ID_NEWCON,   264, 134, 150, 22);
+
+    const int bw = 90, bg = 8, by = ch - 38;
+    int fx = cw - R - bw, bx = fx - (bw + bg), cx = bx - (bw + bg), rx = cx - (bw + bg);
+    MoveCtl(hwnd, ID_RUN,    rx, by, bw, 28);
+    MoveCtl(hwnd, ID_CANCEL, cx, by, bw, 28);
+    MoveCtl(hwnd, ID_BROWSE, bx, by, bw, 28);
+    MoveCtl(hwnd, ID_FOLDER, fx, by, bw, 28);
+}
+
 static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
     case WM_CREATE: {
@@ -276,6 +306,18 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         if (id == ID_FOLDER) { BrowseFolder(hwnd); return 0; }
         return 0;
     }
+    case WM_SIZE:
+        LayoutControls(hwnd);
+        return 0;
+    case WM_GETMINMAXINFO: {
+        RECT r{0, 0, 482, 214};
+        AdjustWindowRectEx(&r, static_cast<DWORD>(GetWindowLongPtrW(hwnd, GWL_STYLE)),
+                           FALSE, 0);
+        auto* mmi = reinterpret_cast<MINMAXINFO*>(lp);
+        mmi->ptMinTrackSize.x = r.right - r.left;
+        mmi->ptMinTrackSize.y = r.bottom - r.top;
+        return 0;
+    }
     case WM_CLOSE:   DestroyWindow(hwnd); return 0;
     case WM_DESTROY: PostQuitMessage(0);  return 0;
     }
@@ -306,14 +348,14 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, PWSTR, int nCmdShow) {
 
     const int cw = 482, ch = 214;
     RECT r{0, 0, cw, ch};
-    AdjustWindowRectEx(&r, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, FALSE, 0);
+    AdjustWindowRectEx(&r, WS_OVERLAPPEDWINDOW, FALSE, 0);
     int ww = r.right - r.left, wh = r.bottom - r.top;
     int sx = (GetSystemMetrics(SM_CXSCREEN) - ww) / 2;
     int sy = (GetSystemMetrics(SM_CYSCREEN) - wh) / 2;
 
     HWND hwnd = CreateWindowExW(
         0, wc.lpszClassName, L"ExecTI - run with high privileges",
-        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, sx, sy, ww, wh,
+        WS_OVERLAPPEDWINDOW, sx, sy, ww, wh,
         nullptr, nullptr, hInst, nullptr);
     if (!hwnd) return 1;
     ShowWindow(hwnd, nCmdShow);

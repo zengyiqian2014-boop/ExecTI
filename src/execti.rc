@@ -8,8 +8,8 @@
 1 ICON "execti.ico"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,1,0
- PRODUCTVERSION 2,0,1,0
+ FILEVERSION 2,1,0,0
+ PRODUCTVERSION 2,1,0,0
  FILEOS VOS__WINDOWS32
  FILETYPE VFT_APP
 BEGIN
@@ -19,11 +19,11 @@ BEGIN
     BEGIN
       VALUE "CompanyName",      "Open Source"
       VALUE "FileDescription",  "ExecTI CLI - run a program as TrustedInstaller (full edition)"
-      VALUE "FileVersion",      "2.0.1.0"
+      VALUE "FileVersion",      "2.1.0.0"
       VALUE "InternalName",     "execti-cli"
       VALUE "OriginalFilename", "execti-cli.exe"
       VALUE "ProductName",      "ExecTI"
-      VALUE "ProductVersion",   "2.0.1.0"
+      VALUE "ProductVersion",   "2.1.0.0"
     END
   END
   BLOCK "VarFileInfo"

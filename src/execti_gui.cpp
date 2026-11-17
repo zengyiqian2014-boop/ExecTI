@@ -284,7 +284,10 @@ static void DoRun(HWND hwnd) {
     std::wstring err;
     if (ti::Run(o, pid, err)) {
         PushMru(raw);
-        DestroyWindow(hwnd);
+        // Refreshing the history resets the edit box. Keep the last command
+        // ready to reuse or replace, and leave the launcher open.
+        SetWindowTextW(g_combo, raw.c_str());
+        SendMessageW(g_combo, CB_SETEDITSEL, 0, MAKELPARAM(0, -1));
     } else {
         MessageBoxW(hwnd, err.c_str(), L"ExecTI - Launch failed", MB_ICONERROR);
     }
@@ -385,7 +388,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         // buttons
         MakeControl(hwnd, L"BUTTON", L"&Run", BS_DEFPUSHBUTTON | WS_TABSTOP,
                     82, 170, 90, 28, ID_RUN);
-        MakeControl(hwnd, L"BUTTON", L"Cancel", WS_TABSTOP, 180, 170, 90, 28, ID_CANCEL);
+        MakeControl(hwnd, L"BUTTON", L"Close", WS_TABSTOP, 180, 170, 90, 28, ID_CANCEL);
         MakeControl(hwnd, L"BUTTON", L"&Browse...", WS_TABSTOP, 278, 170, 90, 28, ID_BROWSE);
         MakeControl(hwnd, L"BUTTON", L"&Folder...", WS_TABSTOP, 376, 170, 90, 28, ID_FOLDER);
 

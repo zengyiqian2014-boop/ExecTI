@@ -44,11 +44,13 @@ Double-click it (accept the UAC prompt) and you get a small Run-style window:
      run it with TrustedInstaller privileges.
 
  Open: [ regedit                              ▼ ]   <- history + built-in programs
-        [ Run ]  [ Cancel ]  [ Browse... ]  [ Folder... ]
+        [ Run ]  [ Close ]  [ Browse... ]  [ Folder... ]
 ```
 
 - Type a command (`regedit`, `cmd`, `notepad C:\Windows\System32\drivers\etc\hosts`),
   or a full path, or `%windir%`-style variables — then press **Run** / Enter.
+- After a successful launch, ExecTI stays open and keeps the last command selected
+  for reuse or replacement. Click **Close** or the window close button to exit.
 - Click the **▼ arrow** for recent commands followed by built-in programs. History
   is kept in `HKCU\Software\ExecTI`, most-recent first, up to 20 entries.
 - Built-in suggestions include Command Prompt, PowerShell, Registry Editor, Task

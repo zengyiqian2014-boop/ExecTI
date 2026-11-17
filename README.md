@@ -17,7 +17,7 @@ in how you drive them:
 | Interface | A graphical **"Run" dialog** (like Win+R) | A **console** command |
 | How you use it | **Double-click**, type or browse, click Run | Type `execti-cli <program>` in a terminal / script |
 | Picking the target | Editable box + **Browse** (file) + **Folder** buttons | Pass it as an argument |
-| History | **Dropdown ▼** remembers recent entries (saved in registry) | — (use your shell history) |
+| Suggestions | **Dropdown ▼** combines recent entries with built-in programs | — (use your shell history) |
 | Best for | Everyday interactive use | Automation, scripts, `.bat` files, remote shells |
 | Window | Yes | No (runs and exits) |
 
@@ -43,14 +43,20 @@ Double-click it (accept the UAC prompt) and you get a small Run-style window:
  🛡  Type a program, folder, or file name, and ExecTI will
      run it with TrustedInstaller privileges.
 
- Open: [ regedit                              ▼ ]   <- dropdown = history
+ Open: [ regedit                              ▼ ]   <- history + built-in programs
         [ Run ]  [ Cancel ]  [ Browse... ]  [ Folder... ]
 ```
 
 - Type a command (`regedit`, `cmd`, `notepad C:\Windows\System32\drivers\etc\hosts`),
   or a full path, or `%windir%`-style variables — then press **Run** / Enter.
-- Click the **▼ arrow** on the right of the box to drop down the list of things you
-  ran before (kept in `HKCU\Software\ExecTI`, most-recent first, up to 20 entries).
+- Click the **▼ arrow** for recent commands followed by built-in programs. History
+  is kept in `HKCU\Software\ExecTI`, most-recent first, up to 20 entries.
+- Built-in suggestions include Command Prompt, PowerShell, Registry Editor, Task
+  Manager, Explorer, Notepad, Control Panel, Services, Computer Management and Event
+  Viewer. They are available on a fresh account and are only saved to history after
+  a successful launch. Existing history is retained; duplicate commands appear once.
+- The window, controls and fonts scale together with Windows display DPI, including
+  when the scale changes or the window moves to another monitor.
 - **Browse** opens a file picker; **Folder** opens a folder picker (a folder is
   opened in Explorer as TrustedInstaller).
 
@@ -158,6 +164,7 @@ export PATH="/opt/llvm-mingw/bin:$PATH"
 make            # both architectures
 make x64        # -> build/x86_64/execti-cli.exe + execti-gui.exe
 make arm64      # -> build/arm64/execti-cli.exe + execti-gui.exe
+make test       # native command history / preset tests
 
 # or the convenience script (auto-detects /opt/llvm-mingw):
 ./build.sh
@@ -196,7 +203,9 @@ You can also trigger it manually from the **Actions → release** tab
 ```
 src/trustedinstaller.h  shared TrustedInstaller launch logic (header-only)
 src/execti.cpp          CLI (console) front end
-src/execti_gui.cpp      GUI front end (Run dialog + history + browse)
+src/execti_gui.cpp      GUI front end (DPI-aware Run dialog + suggestions + browse)
+src/command_history.h  command history / built-in suggestion merge logic
+tests/                 native command-list regression tests
 src/execti.rc           CLI version info + manifest resource
 src/execti_gui.rc       GUI version info + manifest resource
 src/execti.manifest     requireAdministrator (UAC) + themed controls + dpiAware

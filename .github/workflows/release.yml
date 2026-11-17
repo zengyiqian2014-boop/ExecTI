@@ -35,6 +35,9 @@ jobs:
           sudo mv /opt/llvm-mingw-* /opt/llvm-mingw
           echo "/opt/llvm-mingw/bin" >> "$GITHUB_PATH"
 
+      - name: Test command history and built-in suggestions
+        run: make test
+
       - name: Build both architectures
         run: make all
 

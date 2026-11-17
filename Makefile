@@ -43,7 +43,7 @@ BUILD      := build
 X64_DIR    := $(BUILD)/x86_64
 ARM64_DIR  := $(BUILD)/arm64
 
-.PHONY: all x64 arm64 clean
+.PHONY: all x64 arm64 test clean
 all: x64 arm64
 
 x64:   $(X64_DIR)/execti-cli.exe   $(X64_DIR)/execti-gui.exe
@@ -60,7 +60,7 @@ $(X64_DIR)/execti-cli.exe: src/execti.cpp src/trustedinstaller.h $(X64_DIR)/cli-
 		$(LDBASE) -Wl,--subsystem,console $(LIBS_CON) -o $@
 	@echo "[x86_64] -> $@"
 
-$(X64_DIR)/execti-gui.exe: src/execti_gui.cpp src/trustedinstaller.h $(X64_DIR)/gui-res.o | $(X64_DIR)
+$(X64_DIR)/execti-gui.exe: src/execti_gui.cpp src/trustedinstaller.h src/command_history.h $(X64_DIR)/gui-res.o | $(X64_DIR)
 	$(CXX_X64) $(CXXFLAGS) src/execti_gui.cpp $(X64_DIR)/gui-res.o \
 		$(LDBASE) -mwindows $(LIBS_GUI) -o $@
 	@echo "[x86_64] -> $@"
@@ -76,13 +76,22 @@ $(ARM64_DIR)/execti-cli.exe: src/execti.cpp src/trustedinstaller.h $(ARM64_DIR)/
 		$(LDBASE) -Wl,--subsystem,console $(LIBS_CON) -o $@
 	@echo "[arm64]  -> $@"
 
-$(ARM64_DIR)/execti-gui.exe: src/execti_gui.cpp src/trustedinstaller.h $(ARM64_DIR)/gui-res.o | $(ARM64_DIR)
+$(ARM64_DIR)/execti-gui.exe: src/execti_gui.cpp src/trustedinstaller.h src/command_history.h $(ARM64_DIR)/gui-res.o | $(ARM64_DIR)
 	$(CXX_ARM64) $(CXXFLAGS) src/execti_gui.cpp $(ARM64_DIR)/gui-res.o \
 		$(LDBASE) -mwindows $(LIBS_GUI) -o $@
 	@echo "[arm64]  -> $@"
 
 $(X64_DIR) $(ARM64_DIR):
 	mkdir -p $@
+
+# Pure command-list tests run on the build host (no Windows privileges required).
+HOST_CXX ?= c++
+test: $(BUILD)/command-history-test
+	./$(BUILD)/command-history-test
+
+$(BUILD)/command-history-test: tests/command_history_test.cpp src/command_history.h
+	mkdir -p $(BUILD)
+	$(HOST_CXX) -std=c++17 -Wall -Wextra -Werror -pedantic -Isrc $< -o $@
 
 clean:
 	rm -rf $(BUILD)
